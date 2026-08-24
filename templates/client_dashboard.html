@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Client - Folc pe Loc{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-red-700 mb-2">Bine ai revenit, {{ current_user.nume }}!</h1>
+    <p class="text-gray-600">Gestionează-ți rezervările pentru evenimente</p>
+</div>
+
+<div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+    <a href="{{ url_for('client.rezervare_pas1') }}" class="bg-red-700 text-white px-6 py-3 rounded-lg hover:bg-red-800 inline-block">
+        <i class="fas fa-plus-circle mr-2"></i>
+        Rezervare Nouă
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-bold mb-6">Rezervările Mele</h2>
+    
+    {% if evenimente %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-3 text-left">ID</th>
+                        <th class="px-4 py-3 text-left">Tip Eveniment</th>
+                        <th class="px-4 py-3 text-left">Dată</th>
+                        <th class="px-4 py-3 text-left">Locație</th>
+                        <th class="px-4 py-3 text-left">Preț Total</th>
+                        <th class="px-4 py-3 text-left">Status</th>
+                        <th class="px-4 py-3 text-left">Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for eveniment in evenimente %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3">#{{ eveniment.id_eveniment }}</td>
+                        <td class="px-4 py-3 capitalize">{{ eveniment.tip_eveniment }}</td>
+                        <td class="px-4 py-3">{{ eveniment.data_eveniment.strftime('%d.%m.%Y') }}</td>
+                        <td class="px-4 py-3">{{ eveniment.locatie }}</td>
+                        <td class="px-4 py-3 font-bold">{{ eveniment.pret_total_calculat }} RON</td>
+                        <td class="px-4 py-3">
+                            {% if eveniment.status == 'in_asteptare' %}
+                                <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">În așteptare</span>
+                            {% elif eveniment.status == 'acceptat' %}
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Acceptat</span>
+                            {% elif eveniment.status == 'refuzat' %}
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">Refuzat</span>
+                            {% endif %}
+                        </td>
+                        
+                        <!-- ✅ COLOANĂ NOUĂ CU ACȚIUNI: -->
+                        <td class="px-4 py-3">
+                            {% if eveniment.status == 'acceptat' %}
+                                <div class="flex flex-col gap-2">
+                                    <!-- Buton Plată -->
+                                    {% set plata_efectuata = eveniment.plati | selectattr('status_plata', 'equalto', 'platit') | list | length > 0 %}
+                                    {% if not plata_efectuata %}
+                                        <a href="{{ url_for('client.plateste', id=eveniment.id_eveniment) }}" 
+                                           class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 text-center">
+                                            💳 Plătește
+                                        </a>
+                                    {% else %}
+                                        <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded text-sm text-center">
+                                            ✓ Plătit
+                                        </span>
+                                    {% endif %}
+                                    
+                                    
+                                    {% if eveniment.data_eveniment < data_azi %}
+                                        {% set are_recenzie = eveniment.recenzii | selectattr('id_client', 'equalto', current_user.id_utilizator) | list | length > 0 %}
+                                        {% if are_recenzie %}
+                                            <span class="text-green-600 text-sm text-center">
+                                                <i class="fas fa-star"></i> Recenzat
+                                            </span>
+                                        {% else %}
+                                            <a href="{{ url_for('client.adauga_recenzie', id=eveniment.id_eveniment) }}" 
+                                               class="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 text-center">
+                                                ⭐ Recenzie
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="text-gray-400 text-sm">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-500 text-center py-8">Nu ai încă nicio rezervare. Creează prima ta rezervare!</p>
+    {% endif %}
+</div>
+{% endblock %}

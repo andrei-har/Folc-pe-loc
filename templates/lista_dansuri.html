@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Lista Dansuri{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex justify-between items-center">
+    <h1 class="text-4xl font-bold text-red-700">Gestionare Dansuri</h1>
+    <a href="{{ url_for('dansuri.adauga_dans') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+        <i class="fas fa-plus-circle mr-2"></i>Adaugă Dans
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow-lg p-6">
+    {% if dansuri %}
+    <table class="w-full">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-3 text-left">ID</th>
+                <th class="px-4 py-3 text-left">Nume</th>
+                <th class="px-4 py-3 text-left">Tip</th>
+                <th class="px-4 py-3 text-left">Preț</th>
+                <th class="px-4 py-3 text-left">Status</th>
+                <th class="px-4 py-3 text-left">Acțiuni</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dans in dansuri %}
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-3">#{{ dans.id_tip_dans }}</td>
+                <td class="px-4 py-3 font-bold">{{ dans.nume_dans }}</td>
+                <td class="px-4 py-3 capitalize">{{ dans.tip_structura }}</td>
+                <td class="px-4 py-3 font-bold text-red-700">{{ dans.pret_baza }} RON</td>
+                <td class="px-4 py-3">
+                    <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">{{ dans.status|capitalize }}</span>
+                </td>
+                <td class="px-4 py-3">
+                    <a href="{{ url_for('dansuri.editeaza_dans', id=dans.id_tip_dans) }}" class="text-blue-600 hover:text-blue-800 mr-2">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <form method="POST" action="{{ url_for('dansuri.sterge_dans', id=dans.id_tip_dans) }}" 
+                          class="inline" onsubmit="return confirm('Sigur ștergi?')">
+                        <button type="submit" class="text-red-600 hover:text-red-800">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-center py-8 text-gray-500">Nu există dansuri.</p>
+    {% endif %}
+</div>
+{% endblock %}

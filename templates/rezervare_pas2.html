@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Rezervare Nouă - Pas 2{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-red-700 mb-2">Rezervare Nouă</h1>
+        <div class="flex items-center space-x-4 text-sm">
+            <span class="text-green-600"><i class="fas fa-check-circle"></i> Pas 1</span>
+            <span class="text-gray-400">→</span>
+            <span class="bg-red-700 text-white px-4 py-2 rounded-full font-bold">Pas 2: Dansuri</span>
+            <span class="text-gray-400">→ Pas 3</span>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-6">Selectează Dansurile</h2>
+        
+        <form method="POST">
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                {% for dans in dansuri %}
+                <div class="border rounded-lg p-6 hover:border-red-500 transition" id="card_{{ dans.id_tip_dans }}">
+
+                    {% if dans.imagine_url %}
+                    <img src="{{ dans.imagine_url }}" alt="{{ dans.nume_dans }}" 
+                        class="w-full h-48 object-cover rounded-lg mb-4">
+                    {% endif %}
+
+                    <div class="flex items-start mb-4">
+                        <input type="checkbox" name="dans_ids" value="{{ dans.id_tip_dans }}" 
+                            class="mt-1 mr-3 w-5 h-5" 
+                            data-tip="{{ dans.tip_structura }}"
+                            data-pret="{{ dans.pret_baza }}"
+                            onchange="toggleDansatori('{{ dans.id_tip_dans }}', '{{ dans.tip_structura }}')">
+
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-red-700">{{ dans.nume_dans }}</h3>
+                            <p class="text-gray-600 text-sm mb-2">
+                                {{ dans.descriere or 'Descriere disponibilă' }}
+                            </p>
+
+                            {% if dans.video_url %}
+                            <a href="{{ dans.video_url }}" target="_blank" 
+                                class="text-blue-600 hover:underline text-sm mb-2 inline-block">
+                                <i class="fas fa-video mr-1"></i>Vezi Video
+                            </a>
+                            {% endif %}
+
+                            <div class="flex items-center space-x-4 text-sm mt-2">
+                                <span class="bg-gray-100 px-3 py-1 rounded">
+                                    {{ dans.tip_structura|capitalize }}
+                                </span>
+                                <span class="font-bold text-red-700">
+                                    {{ dans.pret_baza }} RON/{% if dans.tip_structura == 'perechi' %}pereche{% else %}dansator{% endif %}
+                                </span>
+                                <span class="text-gray-500">
+                                    {{ dans.durata_minute }} min
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- selector pentru dansatori/perechi - ascuns initial -->
+                    <div id="dansatori_{{ dans.id_tip_dans }}" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                        {% if dans.tip_structura == 'grup' %}
+                            <label class="block text-gray-700 font-bold mb-2">
+                                <i class="fas fa-users mr-2"></i>Număr dansatori (minim 4):
+                            </label>
+                            <input type="number" name="nr_dansatori_{{ dans.id_tip_dans }}" 
+                                min="4" value="4"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                onchange="calculeazaPret('{{ dans.id_tip_dans }}', '{{ dans.tip_structura }}', '{{ dans.pret_baza }}')">
+                        {% else %}
+                            <label class="block text-gray-700 font-bold mb-2">
+                                <i class="fas fa-user-friends mr-2"></i>Număr perechi (minim 2):
+                            </label>
+                            <input type="number" name="nr_perechi_{{ dans.id_tip_dans }}" 
+                                min="2" value="2"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                onchange="calculeazaPret('{{ dans.id_tip_dans }}', '{{ dans.tip_structura }}', '{{ dans.pret_baza }}')">
+                            <p class="text-gray-500 text-sm mt-1">
+                                <i class="fas fa-info-circle"></i> 1 pereche = 2 dansatori
+                            </p>
+                        {% endif %}
+                        
+                        <!-- afisare pret calculat -->
+                        <div class="mt-3 p-3 bg-red-50 rounded-lg">
+                            <span class="text-gray-700">Preț pentru acest dans: </span>
+                            <span id="pret_{{ dans.id_tip_dans }}" class="font-bold text-red-700 text-lg">
+                                {% if dans.tip_structura == 'grup' %}
+                                    {{ (dans.pret_baza * 4)|int }} RON
+                                {% else %}
+                                    {{ (dans.pret_baza * 2 * 2)|int }} RON
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- total general -->
+            <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-6">
+                <div class="flex justify-between items-center text-xl">
+                    <span class="font-bold">Total estimat:</span>
+                    <span id="total_general" class="font-bold text-red-700 text-2xl">0 RON</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-between">
+                <a href="{{ url_for('client.rezervare_pas1') }}" class="bg-gray-300 px-6 py-3 rounded-lg hover:bg-gray-400">
+                    <i class="fas fa-arrow-left mr-2"></i>Înapoi
+                </a>
+                <button type="submit" class="bg-red-700 text-white px-6 py-3 rounded-lg hover:bg-red-800">
+                    Următorul Pas<i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// retirnm preturile pentru dansurile selectate
+const preturiDansuri = {};
+
+function toggleDansatori(dansId, tipStructura) {
+    const div = document.getElementById(`dansatori_${dansId}`);
+    const checkbox = document.querySelector(`input[value="${dansId}"]`);
+    const pret = parseFloat(checkbox.dataset.pret);
+    
+    if (checkbox.checked) {
+        div.classList.remove('hidden');
+        // pretul initial
+        if (tipStructura === 'grup') {
+            preturiDansuri[dansId] = 4 * pret; // minim 4 dansatori
+        } else {
+            preturiDansuri[dansId] = 2 * 2 * pret; // minim 2 perechi = 4 dansatori
+        }
+    } else {
+        div.classList.add('hidden');
+        delete preturiDansuri[dansId];
+    }
+    
+    actualizeazaTotal();
+}
+
+function calculeazaPret(dansId, tipStructura, pretBaza) {
+    pretBaza = parseFloat(pretBaza);
+    let pret = 0;
+    
+    if (tipStructura === 'grup') {
+        const nrDansatori = parseInt(document.querySelector(`input[name="nr_dansatori_${dansId}"]`).value) || 4;
+        // asigura sa fie min 4 dansatori
+        if (nrDansatori < 4) {
+            document.querySelector(`input[name="nr_dansatori_${dansId}"]`).value = 4;
+            pret = 4 * pretBaza;
+        } else {
+            pret = nrDansatori * pretBaza;
+        }
+    } else {
+        const nrPerechi = parseInt(document.querySelector(`input[name="nr_perechi_${dansId}"]`).value) || 2;
+        // asigura min doua perechi
+        if (nrPerechi < 2) {
+            document.querySelector(`input[name="nr_perechi_${dansId}"]`).value = 2;
+            pret = 2 * 2 * pretBaza; // 2 perechi * 2 dansatori/pereche
+        } else {
+            pret = nrPerechi * 2 * pretBaza;
+        }
+    }
+    
+    document.getElementById(`pret_${dansId}`).textContent = pret + ' RON';
+    preturiDansuri[dansId] = pret;
+    actualizeazaTotal();
+}
+
+function actualizeazaTotal() {
+    let total = 0;
+    for (const dansId in preturiDansuri) {
+        total += preturiDansuri[dansId];
+    }
+    document.getElementById('total_general').textContent = total + ' RON';
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.dans-checkbox:checked').forEach(function(checkbox) {
+        const dansId = checkbox.dataset.id;
+        const tipStructura = checkbox.dataset.tip;
+        toggleDansatori(dansId, tipStructura);
+    });
+});
+</script>
+{% endblock %}

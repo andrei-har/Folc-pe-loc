@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Plătește Eveniment{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-red-700 mb-6">Plată Eveniment #{{ eveniment.id_eveniment }}</h1>
+        
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Detalii Eveniment</h2>
+            <p><strong>Tip:</strong> <span class="capitalize">{{ eveniment.tip_eveniment }}</span></p>
+            <p><strong>Dată:</strong> {{ eveniment.data_eveniment.strftime('%d.%m.%Y') }}</p>
+            <p><strong>Locație:</strong> {{ eveniment.locatie }}</p>
+        </div>
+        
+        <div class="bg-red-50 rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-2">Total de Plată</h2>
+            <p class="text-4xl font-bold text-red-700">{{ eveniment.pret_total_calculat }} RON</p>
+        </div>
+        
+        <form method="POST">
+            <div class="mb-6">
+                <label class="block font-bold mb-4">Alege Metoda de Plată:</label>
+                <div class="space-y-3">
+                    <label class="flex items-center p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="radio" name="metoda_plata" value="card" required class="mr-3">
+                        <i class="fas fa-credit-card text-blue-600 mr-2"></i>
+                        <span class="font-bold">Card Bancar</span>
+                    </label>
+                    
+                    <label class="flex items-center p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="radio" name="metoda_plata" value="cash" required class="mr-3">
+                        <i class="fas fa-money-bill-wave text-green-600 mr-2"></i>
+                        <span class="font-bold">Numerar (la eveniment)</span>
+                    </label>
+                    
+                    <label class="flex items-center p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input type="radio" name="metoda_plata" value="transfer" required class="mr-3">
+                        <i class="fas fa-university text-purple-600 mr-2"></i>
+                        <span class="font-bold">Transfer Bancar</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="flex justify-between">
+                <a href="{{ url_for('client.dashboard') }}" class="bg-gray-300 px-6 py-3 rounded-lg hover:bg-gray-400">
+                    Anulează
+                </a>
+                <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-bold">
+                    <i class="fas fa-check mr-2"></i>Confirmă Plata
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

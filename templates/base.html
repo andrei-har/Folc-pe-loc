@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Folc pe Loc{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-red-700 text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="{{ url_for('auth.index') }}" class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-music mr-2"></i>
+                    Folc pe Loc
+                </a>
+                
+                <div class="flex items-center space-x-4">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.rol == 'client' %}
+                            <a href="{{ url_for('client.dashboard') }}" class="hover:text-red-200">Dashboard</a>
+                            <a href="{{ url_for('client.rezervare_pas1') }}" class="hover:text-red-200">Rezervare Nouă</a>
+                        {% else %}
+                            <a href="{{ url_for('coregraf.dashboard') }}" class="hover:text-red-200">Dashboard</a>
+                            <a href="{{ url_for('dansuri.lista_dansuri') }}" class="hover:text-red-200">Dansuri</a>
+                        {% endif %}
+                        <span class="border-l pl-4">{{ current_user.nume }}</span>
+                        <a href="{{ url_for('auth.logout') }}" class="bg-red-900 px-4 py-2 rounded hover:bg-red-800">Deconectare</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="hover:text-red-200">Autentificare</a>
+                        <a href="{{ url_for('auth.register') }}" class="bg-yellow-500 text-red-900 px-4 py-2 rounded hover:bg-yellow-400 font-bold">Înregistrare</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container mx-auto px-4 mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-4 rounded mb-4 {% if category == 'success' %}bg-green-100 text-green-800{% elif category == 'danger' %}bg-red-100 text-red-800{% elif category == 'warning' %}bg-yellow-100 text-yellow-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16 py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2026 Folc pe Loc - Platformă Rezervare Dansuri Populare Românești</p>
+            <div>
+                
+                <a href="{{ url_for('auth.recenzii_publice') }}" class="text-yellow-400 hover:text-yellow-300 underline">
+                    Vezi toate recenziile →
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

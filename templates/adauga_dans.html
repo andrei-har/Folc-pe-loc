@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Adaugă Dans{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <a href="{{ url_for('dansuri.lista_dansuri') }}" class="text-red-700 hover:underline mb-6 inline-block">
+        <i class="fas fa-arrow-left mr-2"></i>Înapoi
+    </a>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-red-700 mb-6">Adaugă Dans Nou</h1>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            
+            <div class="mb-4">
+                <label class="block font-bold mb-2">{{ form.nume_dans.label }}</label>
+                {{ form.nume_dans(class="w-full px-4 py-2 border rounded-lg") }}
+            </div>
+            
+            <div class="mb-4">
+                <label class="block font-bold mb-2">{{ form.descriere.label }}</label>
+                {{ form.descriere(class="w-full px-4 py-2 border rounded-lg", rows="3") }}
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block font-bold mb-2">{{ form.tip_structura.label }}</label>
+                    {{ form.tip_structura(class="w-full px-4 py-2 border rounded-lg") }}
+                </div>
+                <div>
+                    <label class="block font-bold mb-2">{{ form.pret_baza.label }}</label>
+                    {{ form.pret_baza(class="w-full px-4 py-2 border rounded-lg") }}
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block font-bold mb-2">{{ form.regiune.label }}</label>
+                    {{ form.regiune(class="w-full px-4 py-2 border rounded-lg") }}
+                </div>
+                <div>
+                    <label class="block font-bold mb-2">{{ form.durata_minute.label }}</label>
+                    {{ form.durata_minute(class="w-full px-4 py-2 border rounded-lg") }}
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block font-bold mb-2">Imagine</label>
+                <input type="file" name="imagine" accept="image/*" 
+                    class="w-full px-4 py-2 border rounded-lg"
+                    onchange="previewImage(event)">
+                <img id="preview" class="mt-4 max-w-xs rounded-lg hidden">
+            </div>
+
+            <div class="mb-6">
+                <label class="block font-bold mb-2">{{ form.video_url.label }}</label>
+                {{ form.video_url(class="w-full px-4 py-2 border rounded-lg", placeholder="https://youtube.com/watch?v=...") }}
+                <p class="text-sm text-gray-500 mt-1">Link către YouTube, Vimeo sau alt serviciu video</p>
+            </div>
+            
+            <div class="flex justify-between">
+                <a href="{{ url_for('dansuri.lista_dansuri') }}" class="bg-gray-300 px-6 py-3 rounded-lg hover:bg-gray-400">Anulează</a>
+                <button type="submit" class="bg-red-700 text-white px-6 py-3 rounded-lg hover:bg-red-800">
+                    <i class="fas fa-save mr-2"></i>Salvează
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function previewImage(event) {
+    const preview = document.getElementById('preview');
+    const file = event.target.files[0];
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+        }
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+{% endblock %}

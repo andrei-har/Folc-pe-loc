@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Adaugă Recenzie{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <a href="{{ url_for('client.dashboard') }}" class="text-blue-600 hover:underline mb-6 inline-block">
+        <i class="fas fa-arrow-left mr-2"></i>Înapoi la Dashboard
+    </a>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-red-700 mb-6">
+            <i class="fas fa-star text-yellow-500"></i>
+            Lasă o Recenzie
+        </h1>
+        
+        <!-- detalii Eveniment -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Eveniment Recenzat</h2>
+            <p><strong>Tip:</strong> <span class="capitalize">{{ eveniment.tip_eveniment }}</span></p>
+            <p><strong>Dată:</strong> {{ eveniment.data_eveniment.strftime('%d.%m.%Y') }}</p>
+            <p><strong>Locație:</strong> {{ eveniment.locatie }}</p>
+        </div>
+        
+        <!-- formular recenzie -->
+        <form method="POST">
+            <!-- rating cu stele -->
+            <div class="mb-6">
+                <label class="block font-bold mb-3 text-lg">Cât de mulțumit ai fost? <span class="text-red-600">*</span></label>
+                <div class="flex gap-4 justify-center py-4">
+                    <input type="radio" name="rating" value="1" id="star1" required class="hidden peer/1">
+                    <label for="star1" class="text-5xl cursor-pointer transition hover:scale-110 peer-checked/1:text-yellow-500">⭐</label>
+                    
+                    <input type="radio" name="rating" value="2" id="star2" required class="hidden peer/2">
+                    <label for="star2" class="text-5xl cursor-pointer transition hover:scale-110 peer-checked/2:text-yellow-500">⭐</label>
+                    
+                    <input type="radio" name="rating" value="3" id="star3" required class="hidden peer/3">
+                    <label for="star3" class="text-5xl cursor-pointer transition hover:scale-110 peer-checked/3:text-yellow-500">⭐</label>
+                    
+                    <input type="radio" name="rating" value="4" id="star4" required class="hidden peer/4">
+                    <label for="star4" class="text-5xl cursor-pointer transition hover:scale-110 peer-checked/4:text-yellow-500">⭐</label>
+                    
+                    <input type="radio" name="rating" value="5" id="star5" required class="hidden peer/5">
+                    <label for="star5" class="text-5xl cursor-pointer transition hover:scale-110 peer-checked/5:text-yellow-500">⭐</label>
+                </div>
+                <div id="rating-text" class="text-center text-gray-600 mt-2"></div>
+            </div>
+            
+            <!-- comentariu -->
+            <div class="mb-6">
+                <label class="block font-bold mb-2 text-lg">
+                    Comentariu (opțional)
+                </label>
+                <textarea name="comentariu" rows="5" 
+                          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                          placeholder="Spune-ne mai multe despre experiența ta..."></textarea>
+                <p class="text-sm text-gray-500 mt-2">
+                    💡 Feedback-ul tău ne ajută să îmbunătățim serviciile!
+                </p>
+            </div>
+            
+            <!-- butoane -->
+            <div class="flex justify-between">
+                <a href="{{ url_for('client.dashboard') }}" 
+                   class="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400">
+                    Anulează
+                </a>
+                <button type="submit" 
+                        class="bg-yellow-500 text-white px-8 py-3 rounded-lg hover:bg-yellow-600 font-bold">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Trimite Recenzia
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- rating interactiv -->
+<script>
+const ratings = {
+    1: '😞 Nesatisfăcător',
+    2: '😐 Sub așteptări',
+    3: '🙂 Satisfăcător',
+    4: '😊 Foarte bun',
+    5: '🤩 Excelent!'
+};
+
+document.querySelectorAll('input[name="rating"]').forEach(input => {
+    input.addEventListener('change', function() {
+        const text = ratings[this.value];
+        document.getElementById('rating-text').innerHTML = 
+            `<span class="text-xl font-bold text-yellow-600">${text}</span>`;
+        
+        // colorare stele 
+        document.querySelectorAll('label[for^="star"]').forEach((label, index) => {
+            if (index < this.value) {
+                label.classList.add('text-yellow-500');
+                label.classList.remove('text-gray-300');
+            } else {
+                label.classList.add('text-gray-300');
+                label.classList.remove('text-yellow-500');
+            }
+        });
+    });
+});
+
+// Inițializează culorile la încărcare
+document.querySelectorAll('label[for^="star"]').forEach(label => {
+    label.classList.add('text-gray-300');
+});
+</script>
+{% endblock %}

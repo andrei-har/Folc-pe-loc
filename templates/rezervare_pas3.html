@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Rezervare Nouă - Pas 3{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-red-700 mb-2">Rezervare Nouă</h1>
+        <div class="flex items-center space-x-4 text-sm">
+            <span class="text-green-600"><i class="fas fa-check-circle"></i> Pas 1</span>
+            <span>→</span>
+            <span class="text-green-600"><i class="fas fa-check-circle"></i> Pas 2</span>
+            <span>→</span>
+            <span class="bg-red-700 text-white px-4 py-2 rounded-full font-bold">Pas 3: Confirmare</span>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-6">Sumar Eveniment</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div><p class="font-bold">Tip:</p><p class="capitalize">{{ eveniment.tip_eveniment }}</p></div>
+            <div><p class="font-bold">Dată/Oră:</p><p>{{ eveniment.data_eveniment }} - {{ eveniment.ora_eveniment }}</p></div>
+            <div class="md:col-span-2"><p class="font-bold">Locație:</p><p>{{ eveniment.locatie }}</p></div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-6">Dansuri Selectate</h2>
+        {% for dans in dansuri %}
+        <div class="flex justify-between border-b pb-4 mb-4">
+            <div>
+                <p class="font-bold">{{ dans.nume }}</p>
+                <p class="text-gray-600">
+                    {% if dans.tip_structura == 'perechi' %}
+                        {{ dans.nr_dansatori // 2 }} perechi ({{ dans.nr_dansatori }} dansatori)
+                    {% else %}
+                        {{ dans.nr_dansatori }} dansatori
+                    {% endif %}
+                </p>
+            </div>
+            <p class="text-red-700 font-bold text-xl">{{ dans.pret }} RON</p>
+        </div>
+        {% endfor %}
+        <div class="mt-6 pt-6 border-t-2 flex justify-between text-2xl font-bold">
+            <span>TOTAL:</span><span class="text-red-700">{{ pret_total }} RON</span>
+        </div>
+    </div>
+    
+    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-6">
+        <p class="text-yellow-800"><i class="fas fa-info-circle mr-2"></i>Cererea va fi trimisă către coregraf pentru aprobare.</p>
+    </div>
+    
+    <form method="POST">
+        <div class="flex justify-between">
+            <a href="{{ url_for('client.rezervare_pas2') }}" class="bg-gray-300 px-6 py-3 rounded-lg hover:bg-gray-400">
+                <i class="fas fa-arrow-left mr-2"></i>Înapoi
+            </a>
+            <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 font-bold">
+                <i class="fas fa-check mr-2"></i>Trimite Cererea
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

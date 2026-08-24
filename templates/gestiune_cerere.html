@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Gestionare Cerere #{{ eveniment.id_eveniment }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <a href="{{ url_for('coregraf.dashboard') }}" class="text-red-700 hover:underline mb-6 inline-block">
+        <i class="fas fa-arrow-left mr-2"></i>Înapoi
+    </a>
+    
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+        <h1 class="text-3xl font-bold text-red-700 mb-6">Cerere #{{ eveniment.id_eveniment }}</h1>
+        
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Client</h2>
+            <p><strong>Nume:</strong> {{ eveniment.client.nume }}</p>
+            <p><strong>Email:</strong> {{ eveniment.client.email }}</p>
+            <p><strong>Telefon:</strong> {{ eveniment.client.telefon }}</p>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Eveniment</h2>
+            <p><strong>Tip:</strong> <span class="capitalize">{{ eveniment.tip_eveniment }}</span></p>
+            <p><strong>Dată:</strong> {{ eveniment.data_eveniment.strftime('%d.%m.%Y') }} la {{ eveniment.ora_eveniment.strftime('%H:%M') }}</p>
+            <p><strong>Locație:</strong> {{ eveniment.locatie }}</p>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h2 class="text-xl font-bold mb-4">Preț Total</h2>
+            <p class="text-3xl font-bold text-red-700">{{ eveniment.pret_total_calculat }} RON</p>
+        </div>
+    </div>
+    
+    {% if eveniment.status == 'in_asteptare' %}
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-xl font-bold mb-6">Acțiuni</h2>
+        <form method="POST">
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- În gestiune_cerere.html, schimbă butonul Accept în: -->
+<button type="submit" name="actiune" value="accepta" 
+        class="bg-green-600 text-white py-4 rounded-lg hover:bg-green-700 font-bold">
+    <i class="fas fa-check-circle mr-2"></i>Acceptă
+</button>
+                <button type="button" onclick="document.getElementById('modal').classList.remove('hidden')"
+                        class="bg-red-600 text-white py-4 rounded-lg hover:bg-red-700 font-bold">
+                    <i class="fas fa-times-circle mr-2"></i>Refuză
+                </button>
+            </div>
+            
+            <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <div class="bg-white rounded-lg p-8 max-w-md">
+                    <h3 class="text-2xl font-bold mb-4">Motiv Refuz</h3>
+                    <textarea name="motiv_refuz" rows="4"
+                              class="w-full px-4 py-2 border rounded-lg mb-4"></textarea>
+                    <div class="flex justify-end gap-4">
+                        <button type="button" onclick="document.getElementById('modal').classList.add('hidden')"
+                                class="bg-gray-300 px-6 py-2 rounded">Anulează</button>
+                        <button type="submit" name="actiune" value="refuza"
+                                class="bg-red-600 text-white px-6 py-2 rounded">Confirmă</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
